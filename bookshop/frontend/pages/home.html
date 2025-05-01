@@ -3,39 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <title>Bookshop - Home</title>
-  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/home.css">
 </head>
 <body>
-  <h1>Welcome to Bookshop</h1>
-  <button onclick="logout()">Logout</button>
-  <a href="cart.html">Go to Cart</a>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <h1>📚 MyBookshop</h1>
+      <nav>
+        <a href="home.html">Home</a>
+        <a href="cart.html">Cart</a>
+        <button onclick="logout()">Logout</button>
+      </nav>
+    </div>
+  </header>
 
+  <!-- Controls -->
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search books..." oninput="searchBooks()">
+    <select id="sortSelect" onchange="searchBooks()">
+      <option value="">Sort by</option>
+      <option value="title">Title</option>
+      <option value="author">Author</option>
+    </select>
+  </div>
+
+  <!-- Book Listing -->
   <div id="book-list"></div>
 
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 MyBookshop. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Script -->
   <script>
     const token = localStorage.getItem('token');
     if (!token) window.location.href = 'login.html';
 
-    fetch('http://localhost:5000/api/books', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    .then(res => res.json())
-    .then(books => {
+    let booksData = [];
+
+    async function fetchBooks(query = '') {
+      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query || 'fiction'}&maxResults=20`);
+      const data = await res.json();
+      booksData = data.items.map(item => ({
+        id: item.id,
+        title: item.volumeInfo.title || 'No Title',
+        author: (item.volumeInfo.authors || ['Unknown Author']).join(', '),
+        price: Math.floor(Math.random() * 50) + 10,
+        description: item.volumeInfo.description || 'No description available',
+        available: true
+      }));
+      renderBooks();
+    }
+
+    function renderBooks() {
       const container = document.getElementById('book-list');
-      books.forEach(book => {
+      container.innerHTML = '';
+      const sortKey = document.getElementById('sortSelect').value;
+      let filtered = [...booksData];
+
+      if (sortKey) {
+        filtered.sort((a, b) => a[sortKey].localeCompare(b[sortKey]));
+      }
+
+      filtered.forEach(book => {
         const div = document.createElement('div');
+        div.classList.add('book-card');
         div.innerHTML = `
           <h3>${book.title}</h3>
-          <p>${book.author}</p>
-          <p>$${book.price}</p>
-          <button onclick="addToCart(${book.id})">Add to Cart</button>
+          <p><strong>Author:</strong> ${book.author}</p>
+          <p><strong>Price:</strong> $${book.price}</p>
+          <p>${book.description.slice(0, 100)}...</p>
+          <button onclick="addToCart('${book.id}')">Add to Cart</button>
         `;
         container.appendChild(div);
       });
-    });
+    }
+
+    function searchBooks() {
+      const query = document.getElementById('searchInput').value;
+      fetchBooks(query);
+    }
 
     function addToCart(bookId) {
-      fetch('http://localhost:5000/api/cart/add', {
+      fetch('http://localhost:5001/api/cart/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,6 +105,8 @@
       localStorage.removeItem('token');
       window.location.href = 'login.html';
     }
+
+    fetchBooks();
   </script>
 </body>
 </html>

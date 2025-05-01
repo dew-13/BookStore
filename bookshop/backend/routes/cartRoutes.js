@@ -1,29 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
-const db = require('../db/db');
+const {
+  addToCart,
+  getCart,
+  removeFromCart
+} = require('../controllers/cartController');
 
 // Add to cart
-router.post('/add', authMiddleware, (req, res) => {
-  const userId = req.user.id;
-  const { bookId } = req.body;
-  db.query('INSERT INTO cart (user_id, book_id) VALUES (?, ?)', [userId, bookId], err => {
-    if (err) return res.status(500).json({ error: 'DB Error' });
-    res.json({ message: 'Book added to cart' });
-  });
-});
+router.post('/add', authMiddleware.verifyToken, addToCart);
 
-// Get cart items
-router.get('/', authMiddleware, (req, res) => {
-  const userId = req.user.id;
-  const query = `
-    SELECT b.id, b.title, b.author, b.price FROM cart c
-    JOIN books b ON c.book_id = b.id WHERE c.user_id = ?
-  `;
-  db.query(query, [userId], (err, results) => {
-    if (err) return res.status(500).json({ error: 'DB Error' });
-    res.json(results);
-  });
-});
+// Get all cart items for logged-in user
+router.get('/', authMiddleware.verifyToken, getCart);
+
+// Remove item from cart by cart ID
+router.delete('/:cart_id', authMiddleware.verifyToken, removeFromCart);
 
 module.exports = router;

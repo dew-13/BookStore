@@ -4,16 +4,19 @@ const dotenv = require('dotenv');
 const userRoutes = require('./routes/userRoutes');
 
 const cartRoutes = require('./routes/cartRoutes');
-app.use('/api/cart', cartRoutes);
-
 
 dotenv.config();
 const app = express();
+
+app.use('/api/cart', cartRoutes);
+
 app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', userRoutes);
 
-app.listen(5000, () => {
-    console.log('Server is running on port 5000');
+const PORT = process.env.PORT || 5001;
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
