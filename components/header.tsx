@@ -1,110 +1,131 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
-import { ShoppingCart, Menu, X, User, UserCircle, ClipboardList, LogOut } from "lucide-react"
+import {
+  ShoppingCart,
+  Menu,
+  X,
+  User,
+  UserCircle,
+  ClipboardList,
+  LogOut,
+  Home,
+  Search,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/auth-context"
 import { useCart } from "@/context/cart-context"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import clsx from "clsx"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
   const { user, logout } = useAuth()
   const { items } = useCart()
 
   const routes = [
-    {
-      name: "Home",
-      path: "/",
-    },
-    {
-      name: "Explore",
-      path: "/books",
-    },
-
+    { name: "Home", path: "/", icon: Home },
+    { name: "Explore", path: "/books", icon: Search },
   ]
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background">
-      <div className="container flex h-16 items-center px-4">
-        <div className="flex items-center">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold text-xl">BookStore</span>
-          </Link>
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            {routes.map((route) => (
+    <header className={clsx(
+      "sticky top-0 z-50 w-full border-b bg-background transition-shadow",
+      { "shadow-md": isScrolled }
+    )}>
+      <div className="container flex h-16 items-center justify-between px-4">
+        {/* Logo */}
+        <Link href="/" className="flex items-center space-x-2">
+          <img src="/logo.png" alt="BookStore Logo" className="h-6 w-6 object-contain" />
+          <span className="font-bold text-xl">BookStore</span>
+        </Link>
+
+        {/* Right-side icons */}
+        <div className="flex items-center gap-x-4">
+          <div className="hidden md:flex items-center gap-x-4">
+            {routes.map(({ name, path, icon: Icon }) => (
               <Link
-                key={route.path}
-                href={route.path}
-                className={
-                  pathname === route.path
-                    ? "text-foreground font-bold"
-                    : "text-foreground/60 transition-colors hover:text-foreground"
-                }
+                key={path}
+                href={path}
+                className={clsx(
+                  "transition-colors hover:text-primary",
+                  pathname === path ? "text-primary font-bold" : "text-foreground/60"
+                )}
               >
-                {route.name}
+                <Icon className="h-5 w-5 transition-transform hover:scale-110" />
               </Link>
             ))}
-          </nav>
-        </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-            <Button variant="outline" asChild className="mr-2">
-              <Link href="/cart">
-                <ShoppingCart className="mr-2 h-4 w-4" />
-                Cart
-                {items.length > 0 && (
-                  <span className="ml-1 rounded-full bg-primary text-primary-foreground text-xs px-2">
-                    {items.length}
-                  </span>
-                )}
-              </Link>
-            </Button>
           </div>
+
+          <Button variant="ghost" asChild className="relative p-0 hover:bg-transparent">
+            <Link href="/cart">
+              <ShoppingCart className="h-6 w-6 transition-transform hover:scale-110" />
+              {items.length > 0 && (
+                <span className="absolute -top-1 -right-2 rounded-full bg-primary text-primary-foreground text-xs px-2">
+                  {items.length}
+                </span>
+              )}
+            </Link>
+          </Button>
+
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8 border border-gray-300 rounded-full">
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0 hover:bg-transparent">
+                  <Avatar className="h-8 w-8 border border-gray-300">
                     <AvatarFallback>
-                      <User className="h-6 w-6" />
+                      <User className="h-6 w-6 transition-transform hover:scale-110" />
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-background" align="end" forceMount>
-                  <DropdownMenuItem className="font-normal flex items-center space-x-2 rounded-md p-2">
-                    <UserCircle className="w-5 h-5" />
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user.username}</p>
-                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center space-x-2 hover:border hover:border-gray-300 rounded-md p-2">
-                    <Link href="/profile" className="w-full flex items-center space-x-2">
-                      <User className="w-5 h-5" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center space-x-2 hover:border hover:border-gray-300 rounded-md p-2">
-                    <Link href="/orders" className="w-full flex items-center space-x-2">
-                      <ClipboardList className="w-5 h-5" />
-                      <span>Orders</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={logout} className="flex items-center space-x-2 hover:border hover:border-gray-300 rounded-md p-2 cursor-pointer">
-                    <LogOut className="w-5 h-5" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
+              <DropdownMenuContent className="w-56 bg-background" align="end" forceMount>
+                <DropdownMenuItem className="font-normal flex items-center space-x-2 p-2">
+                  <UserCircle className="w-5 h-5" />
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium">{user.username}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/profile" className="flex items-center space-x-2 w-full">
+                    <User className="w-5 h-5" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/orders" className="flex items-center space-x-2 w-full">
+                    <ClipboardList className="w-5 h-5" />
+                    <span>Orders</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={logout} className="flex items-center space-x-2 cursor-pointer">
+                  <LogOut className="w-5 h-5" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <div className="hidden md:flex space-x-1">
@@ -116,8 +137,10 @@ export default function Header() {
               </Button>
             </div>
           )}
+
+          {/* Mobile Drawer Toggle */}
           <button
-            className="md:hidden rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            className="md:hidden transition-transform hover:scale-110"
             onClick={toggleMenu}
           >
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -125,62 +148,59 @@ export default function Header() {
           </button>
         </div>
       </div>
-      {isMenuOpen && (
-        <div className="container md:hidden py-4">
+
+      {/* Mobile Drawer */}
+      <div
+        className={clsx(
+          "fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity md:hidden",
+          isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        )}
+        onClick={toggleMenu}
+      >
+        <div
+          className={clsx(
+            "absolute top-0 left-0 h-full w-64 bg-background p-6 shadow-xl transform transition-transform",
+            isMenuOpen ? "translate-x-0" : "-translate-x-full"
+          )}
+          onClick={(e) => e.stopPropagation()}
+        >
           <nav className="flex flex-col space-y-4">
-            {routes.map((route) => (
+            {routes.map(({ name, path }) => (
               <Link
-                key={route.path}
-                href={route.path}
-                className={
-                  pathname === route.path
-                    ? "text-foreground font-bold"
-                    : "text-foreground/60 transition-colors hover:text-foreground"
-                }
+                key={path}
+                href={path}
                 onClick={toggleMenu}
+                className={clsx(
+                  "text-base transition-colors hover:text-primary",
+                  pathname === path ? "text-primary font-bold" : "text-foreground/60"
+                )}
               >
-                {route.name}
+                {name}
               </Link>
             ))}
             {!user ? (
               <>
-                <Link
-                  href="/login"
-                  className="text-foreground/60 transition-colors hover:text-foreground"
-                  onClick={toggleMenu}
-                >
+                <Link href="/login" onClick={toggleMenu} className="text-foreground/60 hover:text-primary">
                   Login
                 </Link>
-                <Link
-                  href="/signup"
-                  className="text-foreground/60 transition-colors hover:text-foreground"
-                  onClick={toggleMenu}
-                >
+                <Link href="/signup" onClick={toggleMenu} className="text-foreground/60 hover:text-primary">
                   Sign Up
                 </Link>
               </>
             ) : (
               <>
-                <Link
-                  href="/profile"
-                  className="text-foreground/60 transition-colors hover:text-foreground"
-                  onClick={toggleMenu}
-                >
+                <Link href="/profile" onClick={toggleMenu} className="text-foreground/60 hover:text-primary">
                   Profile
                 </Link>
-                <Link
-                  href="/orders"
-                  className="text-foreground/60 transition-colors hover:text-foreground"
-                  onClick={toggleMenu}
-                >
+                <Link href="/orders" onClick={toggleMenu} className="text-foreground/60 hover:text-primary">
                   Orders
                 </Link>
                 <button
-                  className="text-left text-foreground/60 transition-colors hover:text-foreground"
                   onClick={() => {
                     logout()
                     toggleMenu()
                   }}
+                  className="text-left text-foreground/60 hover:text-primary"
                 >
                   Log out
                 </button>
@@ -188,7 +208,7 @@ export default function Header() {
             )}
           </nav>
         </div>
-      )}
+      </div>
     </header>
   )
 }

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { useCart } from "@/context/cart-context"
 import { useToast } from "@/components/ui/use-toast"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ShoppingCart } from "lucide-react"
 
 type Book = {
   id: string
@@ -73,19 +74,19 @@ export function BookGrid({ query, featured = false, limit, sortBy }: BookGridPro
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {Array(limit || 8)
           .fill(0)
           .map((_, i) => (
-            <Card key={i} className="overflow-hidden">
-              <div className="aspect-[2/3] relative">
+            <Card key={i} className="overflow-hidden flex flex-col text-xs">
+              <div className="aspect-[2/3] relative bg-muted">
                 <Skeleton className="h-full w-full" />
               </div>
-              <CardContent className="p-4">
+              <CardContent className="p-2 flex-grow">
                 <Skeleton className="h-4 w-full mb-2" />
                 <Skeleton className="h-4 w-2/3" />
               </CardContent>
-              <CardFooter className="p-4 pt-0 flex justify-between">
+              <CardFooter className="p-2 pt-0 flex justify-between">
                 <Skeleton className="h-10 w-20" />
                 <Skeleton className="h-10 w-32" />
               </CardFooter>
@@ -105,9 +106,9 @@ export function BookGrid({ query, featured = false, limit, sortBy }: BookGridPro
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
       {books.map((book) => (
-        <Card key={book.id} className="overflow-hidden flex flex-col">
+        <Card key={book.id} className="overflow-hidden flex flex-col text-xs">
           <div className="aspect-[2/3] relative bg-muted">
             <Link href={`/books/${book.id}`}>
               {book.thumbnail ? (
@@ -121,16 +122,16 @@ export function BookGrid({ query, featured = false, limit, sortBy }: BookGridPro
               )}
             </Link>
           </div>
-          <CardContent className="p-4 flex-grow">
-            <Link href={`/books/${book.id}`} className="font-medium hover:underline line-clamp-2 h-12">
+          <CardContent className="p-2 flex-grow">
+            <Link href={`/books/${book.id}`} className="font-medium hover:underline line-clamp-2 h-10">
               {book.title}
             </Link>
-            <p className="text-sm text-muted-foreground mt-1">{book.authors?.join(", ") || "Unknown author"}</p>
+            <p className="text-xs text-muted-foreground mt-1">{book.authors?.join(", ") || "Unknown author"}</p>
           </CardContent>
-          <CardFooter className="p-4 pt-0 flex justify-between items-center">
-          <div className="font-bold">LKR {book.price.toFixed(2)}</div>
+          <CardFooter className="p-2 pt-0 flex justify-between items-center">
+          <div className="font-bold text-xs">LKR {book.price.toFixed(2)}</div>
           <Button size="sm" onClick={() => handleAddToCart(book)}>
-            Add to Cart
+            <ShoppingCart className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6" />
           </Button>
         </CardFooter>
       </Card>

@@ -22,8 +22,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.png" type="image/png" />
+      </head>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        
           <AuthProvider>
             <CartProvider>
               <div className="flex min-h-screen flex-col">
@@ -41,7 +44,7 @@ export default function RootLayout({
               <Toaster />
             </CartProvider>
           </AuthProvider>
-        </ThemeProvider>
+       
       </body>
     </html>
   )
