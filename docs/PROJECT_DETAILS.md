@@ -1,4 +1,4 @@
-# Inline Comments for Main Pages
+
 
 ## Home Page (app/page.tsx)
 
@@ -8,21 +8,21 @@
 - Service highlights section showcases key features like Fast Delivery, Special Discounts, Secure Payments, and Customer Support.
 - Uses Tailwind CSS for responsive design and styling.
 
-## Books Page (app/books/page.tsx) [Assumed]
+## Books Page (app/books/page.tsx) 
 
 - Displays a list or grid of books fetched from the backend or external API.
 - Includes search, filter, and sort functionalities.
 - Handles loading and error states during data fetching.
 - Allows navigation to individual book detail pages.
 
-## Cart Page (app/cart/page.tsx) [Assumed]
+## Cart Page (app/cart/page.tsx) 
 
 - Shows the user's shopping cart with added books.
 - Allows updating quantities and removing items.
 - Calculates and displays the total price.
 - Provides a checkout button to proceed with the order.
 
-## Checkout Page (app/checkout/page.tsx) [Assumed]
+## Checkout Page (app/checkout/page.tsx) 
 
 - Collects shipping information and payment method from the user.
 - Validates form inputs before submission.

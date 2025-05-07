@@ -60,8 +60,8 @@ export default function LoginPage() {
     <div className="container mx-auto px-4 py-12">
       <div className="flex flex-col items-center justify-center space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Welcome Back to BookHaven</h1>
-          <p className="text-muted-foreground">Enter your credentials to access your account</p>
+          <h1 className="text-3xl font-bold">Welcome Back!</h1>
+          <p className="text-muted-foreground">Enter your credentials to place orders</p>
         </div>
         <div className="w-full max-w-md space-y-6 rounded-lg border p-6 shadow-sm">
           <Form {...form}>

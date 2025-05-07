@@ -10,13 +10,29 @@ A JSON-based web application for an online bookshop with user authentication, bo
 - Auth: JWT
 - External API: Google Books API
 
-## Setup Instructions
-1. Clone the repo
-2. Configure `.env` in `/backend`
-3. Run `npm install` in `/backend`
-4. Create the MySQL database using `database/schema.sql`
-5. Start the backend with `npm start`
-6. Open `frontend/index.html` in a browser
+# Setup Instructions
+
+1. Install dependencies:
+   ```
+   npm install
+   ```
+
+2. Set environment variables in `.env` file, including:
+   - `JWT_SECRET` for token signing.
+   - Database connection string.
+
+3. Run Prisma migrations and generate client:
+   ```
+   npx prisma migrate dev
+   npx prisma generate
+   ```
+
+4. Start the development server:
+   ```
+   npm run dev
+   ```
+
+
 
 ## API Endpoints
 | Endpoint | Method | Description |
@@ -34,6 +50,12 @@ A JSON-based web application for an online bookshop with user authentication, bo
 - Bcrypt password hashing
 - Input validation on frontend and backend
 
+# Notes
+
+- All API routes use Next.js API route conventions.
+- Authentication is handled via JWT tokens stored in HTTP-only cookies.
+- Profile updates validate required fields and update the database accordingly.
+- Order history is fetched securely for the authenticated user.
 
 
 User (Browser)
@@ -48,6 +70,6 @@ User (Browser)
 │
 └── MySQL Database
     ├── users
-    ├── books
+    ├── orderitems
     ├── cart
     └── orders
